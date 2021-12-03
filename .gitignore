@@ -35,3 +35,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# MONGO DB URI PASSWORD
+next.config.js
