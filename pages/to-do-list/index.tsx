@@ -1,5 +1,5 @@
-import { ToDoList } from '../../src/apps/to-do-list'
+import { TodoList } from '../../src/apps/to-do-list'
 
 export default function Component() {
-	return <ToDoList />
+	return <TodoList />
 }

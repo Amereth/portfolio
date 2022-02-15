@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import connectDB from '../../../src/utils/connectDB'
-import Task from '../../../models/Task'
+import connectDB from '@utils/connectDB'
+import Task from '@models/Task'
 
 connectDB()
 

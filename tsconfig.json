@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es5",
+		"target": "es6",
 		"lib": ["dom", "dom.iterable", "esnext"],
 		"allowJs": true,
 		"skipLibCheck": true,
@@ -20,7 +20,9 @@
 		"paths": {
 			"@mui/styled-engine": ["./node_modules/@mui/styled-engine-sc"],
 			"@todo/store": ["./src/apps/to-do-list/store.tsx"],
-			"@todo/types": ["./src/apps/to-do-list/types.ts"]
+			"@todo/types": ["./src/apps/to-do-list/types.ts"],
+			"@utils/*": ["./src/utils/*"],
+			"@models/*": ["./models/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "next.config.js"],

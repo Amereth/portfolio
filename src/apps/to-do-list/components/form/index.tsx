@@ -1,20 +1,12 @@
 import { useForm, Controller } from 'react-hook-form'
+import { observer } from 'mobx-react-lite'
 import dayjs from 'dayjs'
-import {
-	Box,
-	Container,
-	Stack,
-	TextField,
-	FormControlLabel,
-	Switch,
-	Button,
-} from '@mui/material'
+import { FormControlLabel, Switch } from '@mui/material'
 import DatePicker from '@mui/lab/DatePicker'
-import { FormDataType } from '../../types'
-
-type FormProps = {
-	refreshList: () => void
-}
+import store from '@todo/store'
+import { FormModel } from '@todo/types'
+import * as Styled from './styles'
+import * as strings from './strings'
 
 const defaultValues = {
 	title: '',
@@ -23,99 +15,83 @@ const defaultValues = {
 	isCompleted: false,
 }
 
-const Form: React.FC<FormProps> = ({ refreshList }) => {
+export const Form = observer(() => {
+	const { createTask } = store
 	const {
 		register,
 		handleSubmit,
 		reset,
 		formState: { errors },
 		control,
-	} = useForm<FormDataType>({ defaultValues })
+	} = useForm<FormModel>({ defaultValues })
 
-	const createTask = ({
+	const onSubmit = ({
 		title,
 		description,
-		expirationDate,
 		isCompleted,
-	}: FormDataType) => {
-		fetch('/api/to-do-list', {
-			method: 'POST',
-			body: JSON.stringify({
-				title,
-				description,
-				expirationDate: dayjs(expirationDate).format('DD/MM/YYYY'),
-				isCompleted: isCompleted ?? false,
-				created: Date.now(),
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			},
+		expirationDate,
+	}: FormModel) => {
+		createTask({
+			title,
+			description,
+			isCompleted,
+			expirationDate: dayjs(expirationDate).format('DD/MM/YYYY'),
 		})
-		refreshList()
 		reset()
 	}
 
 	return (
-		<Box component='form' onSubmit={handleSubmit(createTask)}>
-			<Container maxWidth='sm'>
-				<Stack spacing={2}>
-					<TextField
-						sx={{ borderRadius: '30px' }}
-						label='Task Title'
-						placeholder='Enter the title for your task'
-						helperText={errors.title?.message || ' '}
-						error={!!errors.title}
-						{...register('title', {
-							required: 'The title is required',
-							maxLength: {
-								value: 200,
-								message: 'The title should not be longer than 200 symbols',
-							},
-						})}
+		<Styled.Form onSubmit={handleSubmit(onSubmit)}>
+			<Styled.TextField
+				label={strings.TITLE_LABEL}
+				placeholder={strings.TITLE_PLACEHOLDER}
+				helperText={errors.title?.message ?? ' '}
+				error={!!errors.title}
+				{...register('title', {
+					required: strings.TITLE_REQUIRED,
+					maxLength: {
+						value: 200,
+						message: strings.TITLE_MAXLENGTH,
+					},
+				})}
+			/>
+
+			<Styled.TextField
+				label={strings.DESCRIPTION_LABEL}
+				multiline
+				placeholder={strings.DESCRIPTION_PLACEHOLDER}
+				helperText={errors.description?.message ?? ' '}
+				error={!!errors.description}
+				{...register('description')}
+			/>
+
+			<Controller
+				control={control}
+				name='expirationDate'
+				render={({ field }) => (
+					<DatePicker
+						label={strings.EXP_DATE_LABEL}
+						renderInput={(params) => (
+							<Styled.TextField {...params} {...register('expirationDate')} />
+						)}
+						{...field}
 					/>
+				)}
+			/>
 
-					<TextField
-						label='Task Description'
-						multiline
-						placeholder='Describe your task'
-						helperText={errors.description?.message || ' '}
-						error={!!errors.description}
-						{...register('description')}
-					/>
+			<Styled.Expiration>
+				<FormControlLabel
+					label={strings.IS_COMP_LABEL}
+					labelPlacement='start'
+					control={<Switch {...register('isCompleted')} />}
+				/>
+			</Styled.Expiration>
 
-					<Box display='flex' justifyContent='center'>
-						<Controller
-							control={control}
-							name='expirationDate'
-							render={({ field }) => (
-								<DatePicker
-									label='Enter task expiration date'
-									renderInput={(params) => (
-										<TextField {...params} {...register('expirationDate')} />
-									)}
-									{...field}
-								/>
-							)}
-						/>
-					</Box>
-
-					<Box display='flex' justifyContent='center'>
-						<FormControlLabel
-							label='Is task already completed?'
-							labelPlacement='start'
-							control={<Switch {...register('isCompleted')} />}
-						/>
-					</Box>
-
-					<Box display='flex' justifyContent='center'>
-						<Button type='submit' variant='contained' size='large'>
-							Create task
-						</Button>
-					</Box>
-				</Stack>
-			</Container>
-		</Box>
+			<Styled.ButtonWrapper>
+				<Styled.Button type='submit' variant='contained' size='large'>
+					{strings.CREATE_BUTTON_LABEL}
+				</Styled.Button>
+			</Styled.ButtonWrapper>
+		</Styled.Form>
 	)
-}
-
-export default Form
+})
