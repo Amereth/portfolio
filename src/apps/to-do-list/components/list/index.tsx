@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { FormControlLabel, Switch } from '@mui/material'
 import { observer } from 'mobx-react-lite'
 import store from '@todo/store'
@@ -7,35 +7,28 @@ import { Item } from '../item'
 import * as Styled from './styles'
 import * as strings from './strings'
 
-enum VisibleState {
-	ALL = 'all',
-	ACTIVE = 'active',
-	COMPLETED = 'completed',
-}
+type VisibleState = 'all' | 'active' | 'completed'
 
 export const List = observer(() => {
 	const { todoList, activeList, completedList } = store
-	const [list, setList] = useState<Task[]>([])
-	const [isVisible, setIsVisible] = useState<VisibleState>(VisibleState.ALL)
+	const [visible, setVisible] = useState<VisibleState>('all')
 
-	useEffect(() => {
-		setList(todoList)
-	}, [todoList])
-
-	const toggle = (change: VisibleState.ACTIVE | VisibleState.COMPLETED) => {
-		if (isVisible === VisibleState.ALL) {
-			change === VisibleState.ACTIVE
-				? (setIsVisible(VisibleState.ACTIVE), setList(activeList))
-				: (setIsVisible(VisibleState.COMPLETED), setList(completedList))
-		} else if (isVisible === change) {
-			setIsVisible(VisibleState.ALL)
-			setList(todoList)
-		} else if (isVisible !== change) {
-			setIsVisible(change)
-			change === VisibleState.ACTIVE
-				? setList(activeList)
-				: setList(completedList)
+	const toggleVisible = (change: 'active' | 'completed') => {
+		if (visible === 'all') {
+			setVisible(change)
+		} else if (visible === change) {
+			setVisible('all')
+		} else if (visible !== change) {
+			setVisible(change)
 		}
+	}
+
+	const renderList = () => {
+		let list: Task[] = []
+		if (visible === 'active') list = activeList
+		if (visible === 'completed') list = completedList
+		if (visible === 'all') list = todoList
+		return list.map((task) => <Item key={task._id} task={task} />)
 	}
 
 	return (
@@ -44,8 +37,8 @@ export const List = observer(() => {
 				<FormControlLabel
 					control={
 						<Switch
-							checked={isVisible === VisibleState.ACTIVE}
-							onChange={() => toggle(VisibleState.ACTIVE)}
+							checked={visible === 'active'}
+							onChange={() => toggleVisible('active')}
 						/>
 					}
 					label={strings.ACTIVE_LABEL}
@@ -53,16 +46,14 @@ export const List = observer(() => {
 				<FormControlLabel
 					control={
 						<Switch
-							checked={isVisible === VisibleState.COMPLETED}
-							onChange={() => toggle(VisibleState.COMPLETED)}
+							checked={visible === 'completed'}
+							onChange={() => toggleVisible('completed')}
 						/>
 					}
 					label={strings.COMPLETED_LABEL}
 				/>
 			</Styled.SwitchWrapper>
-			{list.map((task) => (
-				<Item key={task._id} task={task} />
-			))}
+			{renderList()}
 		</>
 	)
 })

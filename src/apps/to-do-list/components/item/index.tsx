@@ -2,7 +2,7 @@ import { Typography } from '@mui/material'
 import { DoneAll, RemoveDone, Edit, Delete } from '@mui/icons-material'
 import store from '@todo/store'
 import { Task } from '@todo/types'
-import { Container, TextWrapper, StyleButton } from './styles'
+import { Container, TextWrapper, StyledButton } from './styles'
 
 type ItemProps = {
 	task: Task
@@ -13,6 +13,9 @@ export const Item = ({
 }: ItemProps) => {
 	const { deleteTask, completeTask, undoTask } = store
 
+	const onComplete = () => completeTask(_id)
+	const onUndo = () => undoTask(_id)
+
 	return (
 		<Container component='li' key={_id} isCompleted={isCompleted}>
 			<TextWrapper>
@@ -20,23 +23,18 @@ export const Item = ({
 				<Typography>{description}</Typography>
 				<Typography>{expirationDate}</Typography>
 			</TextWrapper>
-			<StyleButton
-				aria-label='edit'
+			<StyledButton
 				isCompleted={isCompleted}
-				onClick={isCompleted ? () => undoTask(_id) : () => completeTask(_id)}
+				onClick={isCompleted ? onUndo : onComplete}
 			>
 				{isCompleted ? <RemoveDone /> : <DoneAll />}
-			</StyleButton>
-			<StyleButton aria-label='edit' isCompleted={isCompleted}>
+			</StyledButton>
+			<StyledButton isCompleted={isCompleted}>
 				<Edit />
-			</StyleButton>
-			<StyleButton
-				aria-label='delete'
-				isCompleted={isCompleted}
-				onClick={() => deleteTask(_id)}
-			>
+			</StyledButton>
+			<StyledButton isCompleted={isCompleted} onClick={() => deleteTask(_id)}>
 				<Delete />
-			</StyleButton>
+			</StyledButton>
 		</Container>
 	)
 }

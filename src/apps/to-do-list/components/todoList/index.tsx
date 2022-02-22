@@ -17,7 +17,7 @@ export const TodoList = observer(() => {
 		<Wrapper>
 			<Container maxWidth='md'>
 				<Header component='h2' variant='h4' align='center'>
-					Created with Day.js, MUI, React Hook Form
+					Created with MUI, MobX and React Hook Form
 				</Header>
 				<Form />
 				<List />
